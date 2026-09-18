@@ -1,0 +1,37 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+  moduleFormat = "esm"
+  generatedFileExtension = "ts"
+  importFileExtension = "ts"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+model Relatorio {
+  id  Int @id @default(autoincrement())
+  data  DateTime @default(now())
+  servicos  Servico[]
+  pendencias  Pendencia[]
+}
+model Servico {
+  id  Int @id @default(autoincrement())
+  descricao String
+  relatorioId Int
+  relatorio Relatorio @relation(fields:[relatorioId], references: [id])
+}
+model Pendencia {
+  id  Int @id @default(autoincrement())
+  descricao String
+  preciaPeca  Boolean @default(false)
+  peca  String?
+  pecaDisponivel  Boolean?
+  relatorioId Int
+  relatorio Relatorio @relation(fields: [relatorioId], references: [id])
+}

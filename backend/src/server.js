@@ -7,11 +7,33 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.get("/", (req, res) =>{
-
-    res.json({
-        message: "API do Relatório de Serviços Funcionando!"
+app.get("/teste-banco", async (req, res) =>{
+    const relatorios = await prisma.relatorio.findMany({
+        include:{
+            servicos:true
+        }
     });
+
+    res.json(relatorios);
+});
+
+app.post("/relatorios", async(req, res) => {
+
+    const {servicos} = req.body;
+
+    const relatorio = await prisma.relatorio.create({
+        data: {
+            servicos: {
+                create: servicos.map((descricao) => ({
+                    descricao
+                }))
+            }
+        },
+        include: {
+            servicos: true
+        }
+    });
+    res.json(relatorio);
 });
 const PORT = 3333;
 

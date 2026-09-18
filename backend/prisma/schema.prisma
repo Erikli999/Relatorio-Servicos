@@ -29,7 +29,7 @@ model Servico {
 model Pendencia {
   id  Int @id @default(autoincrement())
   descricao String
-  preciaPeca  Boolean @default(false)
+  precisaPeca  Boolean @default(false)
   peca  String?
   pecaDisponivel  Boolean?
   relatorioId Int

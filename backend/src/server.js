@@ -19,7 +19,7 @@ app.get("/teste-banco", async (req, res) =>{
 
 app.post("/relatorios", async(req, res) => {
 
-    const {servicos} = req.body;
+    const {servicos, pendencias} = req.body;
 
     const relatorio = await prisma.relatorio.create({
         data: {
@@ -27,14 +27,35 @@ app.post("/relatorios", async(req, res) => {
                 create: servicos.map((descricao) => ({
                     descricao
                 }))
+            },
+        
+            pendencias: {
+                create: pendencias.map((pendencia) => ({
+                    descricao: pendencia.descricao,
+                    precisaPeca: pendencia.precisaPeca,
+                    peca: pendencia.peca,
+                    pecaDisponivel: pendencia.pecaDisponivel
+                }))
             }
         },
         include: {
-            servicos: true
+            servicos: true,
+            pendencias: true
         }
     });
     res.json(relatorio);
 });
+
+app.get("/relatorios", async (req, res) =>{
+    const relatorios = await prisma.relatorio.findMany({
+        include:{
+            servicos:true
+        }
+    });
+
+    res.json(relatorios);
+});
+
 const PORT = 3333;
 
 app.listen(PORT, () =>{

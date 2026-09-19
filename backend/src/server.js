@@ -49,7 +49,23 @@ app.post("/relatorios", async(req, res) => {
 app.get("/relatorios", async (req, res) =>{
     const relatorios = await prisma.relatorio.findMany({
         include:{
-            servicos:true
+            servicos:true,
+            pendencias: true
+        }
+    });
+
+    res.json(relatorios);
+});
+
+app.get("/relatorios/:id", async (req, res) =>{
+    const {id} = req.params;
+    const relatorios = await prisma.relatorio.findUnique({
+        where: {
+            id: Number(id)
+        },
+        include:{
+            servicos:true,
+            pendencias: true
         }
     });
 

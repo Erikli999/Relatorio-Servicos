@@ -19,10 +19,12 @@ app.get("/teste-banco", async (req, res) =>{
 
 app.post("/relatorios", async(req, res) => {
 
-    const {servicos, pendencias} = req.body;
+    const {cliente, servicos, pendencias} = req.body;
 
     const relatorio = await prisma.relatorio.create({
         data: {
+            cliente,
+            
             servicos: {
                 create: servicos.map((descricao) => ({
                     descricao

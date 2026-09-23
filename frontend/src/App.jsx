@@ -9,6 +9,7 @@ function App() {
   const[precisaPeca, setPrecisaPeca] = useState(null);
   const[peca, setPeca] = useState("");
   const[pecaDisponivel, setPecaDisponivel] = useState(null);
+  const [pecaSolicitada, setPecaSolicitada] = useState(null);
   const adicionarServico = () => {
     if (novoServico.trim() === "") {
       return;
@@ -159,6 +160,31 @@ function App() {
                         checked={pecaDisponivel === false}
                         onChange={() => setPecaDisponivel(false)}
                       />
+                        Não
+                    </label>
+                  </div>
+
+                  <label className="text-sm front-medium text-gray-700">
+                    Peça já foi solicitada?
+                  </label>
+                  <div className="flex gap-4">
+                    <label className="flex items-center gap-2">
+                      <input 
+                        type="radio"
+                        name="pecaSolicitada"
+                        checked={pecaSolicitada === true}
+                        onChange={() => setPecaSolicitada(true)}
+                      />
+                      Sim
+                    </label>
+
+                    <label className="flex items-center gap-2">
+                      <input 
+                        type="radio"
+                        name="pecaSolicitada"
+                        checked={pecaSolicitada === false} 
+                        onChange={() => setPecaSolicitada (false)}
+                        />
                         Não
                     </label>
                   </div>

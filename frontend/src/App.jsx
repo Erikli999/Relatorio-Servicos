@@ -4,7 +4,7 @@ function App() {
   const[cliente, setCliente] = useState("");
   const[servicos, setServicos] = useState([]);
   const[novoServico, setNovoServico] = useState("");
-  const[pendencias, setPendencias] = useState("");
+  const[pendencias, setPendencias] = useState([]);
   const[novaPendencia, setNovaPendencia] = useState("");
   const[precisaPeca, setPrecisaPeca] = useState(null);
   const[peca, setPeca] = useState("");
@@ -19,6 +19,19 @@ function App() {
   }; 
   const removerServico = (index) => {
     setServicos(servicos.filter((_, i) => i !== index));
+  };
+  const adicionarPendencia = () => {
+    if (novaPendencia.trim() === ""){
+      return;
+    }
+    const nova = {
+      descricao: novaPendencia,
+      precisaPeca: precisaPeca,
+      peca: precisaPeca ? peca: null,
+      pecaDisponivel: precisaPeca ? pecaDisponivel: null,
+      pecaSolicitada: precisaPeca ? pecaSolicitada: null
+    };
+    setPendencias([...pendencias, nova]);
   };
   return(
     <div className="min-h-screen bg-gray-300 p-6">
@@ -191,9 +204,25 @@ function App() {
                 </>
               )}
 
-              <button className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-orange-700">
+              <button
+                onClick={adicionarPendencia}
+                className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-orange-700">
                 + Adicionar Pendências
               </button>
+
+              {pendencias.map((pendencia, index) => (
+                <div 
+                  key={index}
+                  className="rounded-lg bg-gray-100 px-4 py-3 text-sm text-gray-700"
+                >
+                  <p>{pendencia.descricao}</p>
+                  {pendencia.precisaPeca && (
+                    <p className="mt-1 text-xs">
+                      Peça: {pendencia.peca}
+                    </p>
+                  )}
+                </div>
+              ))}
             </div>
           </section>
         </div>

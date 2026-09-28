@@ -10,6 +10,9 @@ function App() {
   const[peca, setPeca] = useState("");
   const[pecaDisponivel, setPecaDisponivel] = useState(null);
   const [pecaSolicitada, setPecaSolicitada] = useState(null);
+  const removerPendencia = (index) => {
+    setPendencias(pendencias.filter((_, i) => i !== index));
+  };
   const adicionarServico = () => {
     if (novoServico.trim() === "") {
       return;
@@ -213,14 +216,22 @@ function App() {
               {pendencias.map((pendencia, index) => (
                 <div 
                   key={index}
-                  className="rounded-lg bg-gray-100 px-4 py-3 text-sm text-gray-700"
+                  className="flex items-center justify-between rounded-lg bg-gray-100 px-4 
+                  py-3 text-sm text-gray-700"
                 >
-                  <p>{pendencia.descricao}</p>
-                  {pendencia.precisaPeca && (
-                    <p className="mt-1 text-xs">
-                      Peça: {pendencia.peca}
-                    </p>
-                  )}
+                  <div>
+                    <p>{pendencia.descricao}</p>
+                      {pendencia.precisaPeca && (
+                      <p className="mt-1 text-xs">
+                        Peça: {pendencia.peca}
+                      </p>
+                    )}
+                  </div>
+                  <button 
+                    onClick={() => removerPendencia(index)}
+                    className="text-red-500 hover:text-red-700">
+                    Remover
+                  </button>
                 </div>
               ))}
             </div>

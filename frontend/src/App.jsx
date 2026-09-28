@@ -10,6 +10,22 @@ function App() {
   const[peca, setPeca] = useState("");
   const[pecaDisponivel, setPecaDisponivel] = useState(null);
   const [pecaSolicitada, setPecaSolicitada] = useState(null);
+  const salvarRelatorio = async () => {
+    const dados = {
+      cliente,
+      servicos,
+      pendencias
+    };
+    const resposta = await fetch ("http://localhost:3333/relatorios", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(dados)
+    });
+    const resultado = await resposta.json();
+    console.log(resultado);
+  };
   const removerPendencia = (index) => {
     setPendencias(pendencias.filter((_, i) => i !== index));
   };
@@ -239,7 +255,9 @@ function App() {
         </div>
 
         <div className="flex justify-end">
-          <button className="rounded bg-green-600 px-6 py-3 font-semibold text-white hover:bg-blue-700">
+          <button 
+            onClick={salvarRelatorio}
+            className="rounded bg-green-600 px-6 py-3 font-semibold text-white hover:bg-blue-700">
             Salvar Relatório
           </button>
         </div>

@@ -33,6 +33,7 @@ model Pendencia {
   precisaPeca  Boolean @default(false)
   peca  String?
   pecaDisponivel  Boolean?
+  pecaSolicitada  Boolean?
   relatorioId Int
   relatorio Relatorio @relation(fields: [relatorioId], references: [id])
 }

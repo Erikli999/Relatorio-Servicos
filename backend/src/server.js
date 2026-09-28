@@ -36,7 +36,8 @@ app.post("/relatorios", async(req, res) => {
                     descricao: pendencia.descricao,
                     precisaPeca: pendencia.precisaPeca,
                     peca: pendencia.peca,
-                    pecaDisponivel: pendencia.pecaDisponivel
+                    pecaDisponivel: pendencia.pecaDisponivel,
+                    pecaSolicitada: pendencia.pecaSolicitada
                 }))
             }
         },

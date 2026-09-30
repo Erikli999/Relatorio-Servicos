@@ -10,6 +10,24 @@ function App() {
   const[peca, setPeca] = useState("");
   const[pecaDisponivel, setPecaDisponivel] = useState(null);
   const [pecaSolicitada, setPecaSolicitada] = useState(null);
+  const [tela, setTela] = useState("novo");
+  const [relatorios, setRelatorios] = useState([]);
+  const [relatorioSelecionado, setRelatorioSelecionado] =useState(null)
+
+  const buscarRelatorios = async () => {
+    const resposta = await fetch("http://localhost:3333/relatorios");
+    const dados = await resposta.json();
+
+    setRelatorios(dados);
+  }
+
+  const visualizarRelatorio = async (id) => {
+    const resposta = await fetch(`http://localhost:3333/relatorios/${id}`);
+    const dados = await resposta.json();
+
+    setRelatorioSelecionado(dados);
+  }
+
   const salvarRelatorio = async () => {
     const dados = {
       cliente,
@@ -76,7 +94,86 @@ function App() {
             className="w-full rounded-lg broder broder-gray-300 bg-white px-4 py-3 shadow-md outline-none focus:border-blue-500"
           />
         </div>
-        <div className="flex justify-center gap-6">
+        
+        <div>
+          <button
+            onClick={() => {
+              setTela("historico");
+              buscarRelatorios();
+            }}
+            className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+          >
+            Relatórios Anteriores
+          </button>
+
+          {relatorioSelecionado && (
+            <div className="bg-white p-6 rounded-lg shadow mt-4">
+              <h2 className="text-xl font-bold">
+                {relatorioSelecionado.cliente}
+              </h2>
+
+              <p className="text-gray-600">
+                {new Date(relatorioSelecionado.data).toLocaleDateString("pt-BR")}
+              </p>
+
+              <h3 className="font-bold mt-4">Serviços realizados</h3>
+
+              {relatorioSelecionado.servicos.map((servico) => (
+                <p key={servico.id}>
+                  • {servico.descricao}
+                </p>
+              ))}
+
+              <h3 className="font-bold mt-4">Pendências</h3>
+
+              {relatorioSelecionado.pendencias.map((pendencia) => (
+                <div key={pendencia.id} className="mt-2">
+                  <p>• {pendencia.descricao}</p>
+
+                  {pendencia.peca && (
+                    <p className="text-sm text-gray-600">
+                      Peça: {pendencia.peca}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="mt-4 space-y-3">
+            {relatorios.map((relatorio) => (
+              <div
+                key={relatorio.id}
+                className="bg-white p-4 rounded-lg shadow"
+              >
+                <h3 className="font-bold">
+                  {relatorio.cliente}
+                </h3>
+
+                <p className="text-sm text-gray-600">
+                  {new Date(relatorio.data).toLocaleDateString("pt-BR")}
+                </p>
+
+                <p className="text-sm">
+                  Serviços: {relatorio.servicos.length}
+                </p>
+
+                <p className="text-sm">
+                  Pendências: {relatorio.pendencias.length}
+                </p>
+
+                <button 
+                  onClick={() => visualizarRelatorio(relatorio.id)}
+                  className="mt-2 bg-blue-600 text-white px-4 py-2 rounded">
+                  Visualizar
+                </button>
+              </div>
+            ))}
+          </div>
+
+        </div>
+
+        <div className="flex justify-center gap-6 mt-4">
           <section className="mb-8 rounded-lg bg-white p-6 shadow">
             <h2 className="mb-4 text-xl font-semibloud text-gray-800">
              Serviços Realizados

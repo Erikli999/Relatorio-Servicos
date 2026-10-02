@@ -1,4 +1,5 @@
-import { useState } from "react"
+import { useState } from "react";
+import {jsPDF} from "jspdf";
 
 function App() {
   const[cliente, setCliente] = useState("");
@@ -12,7 +13,59 @@ function App() {
   const [pecaSolicitada, setPecaSolicitada] = useState(null);
   const [tela, setTela] = useState("novo");
   const [relatorios, setRelatorios] = useState([]);
-  const [relatorioSelecionado, setRelatorioSelecionado] =useState(null)
+  const [relatorioSelecionado, setRelatorioSelecionado] =useState(null);
+
+  const baixarPDF = () => {
+    if (!relatorioSelecionado) return;
+
+    const doc = new jsPDF();
+    
+    let y = 20;
+
+    doc.setFontSize(18);
+    doc.text("Relatório de Serviços", 20, y);
+
+    y += 15;
+
+    doc.setFontSize(12);
+    doc.text(`Cliente: ${relatorioSelecionado.cliente}`, 20, y);
+
+    y += 8;
+
+    doc.text (
+      `Data: ${new Date(relatorioSelecionado.data).toLocaleDateString("pt-BR")}`,20,y
+    );
+
+    y += 15;
+
+    doc.setFontSize(12);
+
+    (relatorioSelecionado.servico || []).forEach((servico) => {
+      doc.text(`• ${servico.descricao}`, 25, y);
+      y += 8;
+    });
+
+    y +=8;
+
+    doc.setFontSize(14);
+    doc.text("Pendências:", 20, y);
+
+    y += 10;
+
+    doc.setFontSize(12);
+
+    (relatorioSelecionado.pendencias || []).forEach((pendencia) => {
+      doc.text(`• ${pendencia.descricao}`, 25, y);
+      y += 8;
+
+      if(pendencia.pecaSolicitada) {
+        doc.text(`Peça: ${pendencia.peca}`, 30, y);
+        y += 8;
+      }
+      y += 3;
+    });
+    doc.save(`relatorio-${relatorioSelecionado.id}.pdf`)
+  };
 
   const buscarRelatorios = async () => {
     const resposta = await fetch("http://localhost:3333/relatorios");
@@ -137,6 +190,13 @@ function App() {
                   )}
                 </div>
               ))}
+
+              <button
+                onClick={baixarPDF}
+                className="mt-6 bg-green-600 text-white px-4 py-2 rounded-lg"
+              >
+                Baixar PDF
+              </button>
             </div>
           )}
 

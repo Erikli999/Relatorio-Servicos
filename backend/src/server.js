@@ -7,16 +7,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.get("/teste-banco", async (req, res) =>{
-    const relatorios = await prisma.relatorio.findMany({
-        include:{
-            servicos:true
-        }
-    });
-
-    res.json(relatorios);
-});
-
 app.post("/relatorios", async(req, res) => {
 
     const {cliente, servicos, pendencias} = req.body;
@@ -73,6 +63,29 @@ app.get("/relatorios/:id", async (req, res) =>{
     });
 
     res.json(relatorios);
+});
+
+app.delete("/relatorios/:id", async (req, res) => {
+    const {id} = req.params;
+
+    await prisma.servico.deleteMany({
+        where: {
+            relatorioId: Number(id)
+        }
+    });
+
+    await prisma.pendencia.deleteMany({
+        where: {
+            relatorioId: Number(id)
+        }
+    });
+    
+    await prisma.relatorio.delete({
+        where: {
+            id: Number(id)
+        }
+    });
+    res.json({mensagem: "Relatorio excluido com sucesso!"});
 });
 
 const PORT = 3333;

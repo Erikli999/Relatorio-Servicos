@@ -14,6 +14,35 @@ function App() {
   const [tela, setTela] = useState("novo");
   const [relatorios, setRelatorios] = useState([]);
   const [relatorioSelecionado, setRelatorioSelecionado] =useState(null);
+  const [mensagem, setMensagem] = useState("")
+
+  const relatoriosPorData = relatorios.reduce((grupos, relatorio) => {
+    const data = new Date(relatorio.data).toLocaleDateString("pt-BR");
+
+    if (!grupos[data]) {
+      grupos[data] = [];
+    }
+
+    grupos[data].push(relatorio);
+
+    return grupos;
+  }, {});
+
+  const excluirRelatorio = async (id) => {
+    const confirmar = window.confirm(
+      "Tem certeza que deseja excluir esse relatório?"
+    );
+
+    if (!confirmar){
+      return;
+    };
+
+    await fetch(`http://localhost:3333/relatorios/${id}`, {
+      method: "DELETE"
+    });
+
+    buscarRelatorios();
+  };
 
   const baixarPDF = () => {
     if (!relatorioSelecionado) return;
@@ -95,7 +124,18 @@ function App() {
       body: JSON.stringify(dados)
     });
     const resultado = await resposta.json();
-    console.log(resultado);
+
+    setMensagem("Relatório salvo com sucesso!");
+
+    setCliente("");
+    setServicos([]);
+    setPendencias([]);
+    setNovoServico("");
+    setNovaPendencia("");
+    setPrecisaPeca(null);
+    setPeca("");
+    setPecaDisponivel("");
+    setPecaSolicitada("");
   };
   const removerPendencia = (index) => {
     setPendencias(pendencias.filter((_, i) => i !== index));
@@ -122,6 +162,12 @@ function App() {
       pecaSolicitada: precisaPeca ? pecaSolicitada: null
     };
     setPendencias([...pendencias, nova]);
+
+    setNovaPendencia("");
+    setPrecisaPeca(null);
+    setPeca("");
+    setPecaDisponivel("");
+    setPecaSolicitada("");
   };
   return(
     <div className="min-h-screen bg-gray-300 p-6">
@@ -227,6 +273,12 @@ function App() {
                   className="mt-2 bg-blue-600 text-white px-4 py-2 rounded">
                   Visualizar
                 </button>
+                <button 
+                  onClick={() => excluirRelatorio(relatorio.id)}
+                  className="mt-2 bg-red-600 text-white px-4 py-2 rounded-lg"
+                >
+                  Excluir
+                </button>
               </div>
             ))}
           </div>
@@ -258,7 +310,7 @@ function App() {
               {servicos.map((servico, index) => (
                 <div 
                 key={index}
-                className="rounded-lg bg-gray-100 px-4 py-3 text-sm text-gray-700"
+                className="flex items-center justify-between rounded-lg bg-gray-100 px-4 py-3 text-sm text-gray-700"
                 >
                   <span>{servico}</span>
 
@@ -412,6 +464,11 @@ function App() {
         </div>
 
         <div className="flex justify-end">
+          {mensagem && (
+            <p className="mt-4 text-green-600 font-semibold">
+              {mensagem}
+            </p>
+          )}
           <button 
             onClick={salvarRelatorio}
             className="rounded bg-green-600 px-6 py-3 font-semibold text-white hover:bg-blue-700">

@@ -16,6 +16,71 @@ function App() {
   const [relatorioSelecionado, setRelatorioSelecionado] =useState(null);
   const [mensagem, setMensagem] = useState("")
 
+  const baixarPDFDoDia = (relatoriosDoDia, data) => {
+    if (relatoriosDoDia.length === 0) return;
+
+    const doc = new jsPDF();
+
+    let y = 20;
+
+    doc.setFontSize(18);
+    doc.text("Relatório de Serviços", 20, y);
+
+    y += 10;
+
+    doc.setFontSize(12);
+    doc.text(`Data: ${data}`, 20, y);
+
+    y += 15;
+
+    relatoriosDoDia.forEach((relatorio, index) => {
+      if (index > 0) {
+        doc.addPage();
+        y = 20;
+      }
+
+      doc.setFontSize(16);
+      doc.text(`Cliente: ${relatorio.cliente}`, 20, y);
+
+      y += 12;
+
+      doc.setFontSize(14);
+      doc.text("Serviços realizados", 20, y);
+
+      y += 10;
+
+      doc.setFontSize(12);
+
+      (relatorio.servicos || []).forEach((servico) => {
+        doc.text(`• ${servico.descricao}`, 25, y);
+        y += 8;
+      });
+
+      y += 8;
+
+      doc.setFontSize(14);
+      doc.text("Pendências", 20, y);
+
+      y += 10;
+
+      doc.setFontSize(12);
+
+      (relatorio.pendencias || []).forEach((pendencia) => {
+        doc.text(`• ${pendencia.descricao}`, 25, y);
+        y += 8;
+
+        if (pendencia.peca) {
+          doc.text(`Peça: ${pendencia.peca}`, 30, y);
+          y += 8;
+        }
+
+        y += 3;
+      });
+    });
+
+    doc.save(`relatorio-${data.replaceAll("/", "-")}.pdf`);
+  };
+
   const relatoriosPorData = relatorios.reduce((grupos, relatorio) => {
     const data = new Date(relatorio.data).toLocaleDateString("pt-BR");
 
@@ -247,37 +312,43 @@ function App() {
           )}
 
           <div className="mt-4 space-y-3">
-            {relatorios.map((relatorio) => (
-              <div
-                key={relatorio.id}
-                className="bg-white p-4 rounded-lg shadow"
-              >
-                <h3 className="font-bold">
-                  {relatorio.cliente}
+            {Object.entries(relatoriosPorData).map(([data, relatoriosDoDia]) => (
+              <div key={data}>
+                <h3 className="text-lg font-bold mb-3">
+                  {data}
                 </h3>
-
-                <p className="text-sm text-gray-600">
-                  {new Date(relatorio.data).toLocaleDateString("pt-BR")}
-                </p>
-
-                <p className="text-sm">
-                  Serviços: {relatorio.servicos.length}
-                </p>
-
-                <p className="text-sm">
-                  Pendências: {relatorio.pendencias.length}
-                </p>
-
-                <button 
-                  onClick={() => visualizarRelatorio(relatorio.id)}
-                  className="mt-2 bg-blue-600 text-white px-4 py-2 rounded">
-                  Visualizar
-                </button>
-                <button 
-                  onClick={() => excluirRelatorio(relatorio.id)}
-                  className="mt-2 bg-red-600 text-white px-4 py-2 rounded-lg"
+                <div className="space-y-3">
+                  {relatoriosDoDia.map((relatorio) => (
+                    <div
+                      key={relatorio.id}
+                      className="bg-white p-4 rounded-lg shadow"
+                    >
+                      <h3 className="font-bold">
+                        {relatorio.cliente}
+                      </h3>
+                      <p className="text-sm">
+                        Pendências: {relatorio.pendencias.length}
+                      </p>
+                      <button
+                        onClick={() => visualizarRelatorio(relatorio.id)}
+                        className="mt-2 bg-blue-600 text-white px-4 py-2 rounded"
+                      >
+                        Visualizar
+                      </button>
+                       <button
+                        onClick={() => excluirRelatorio(relatorio.id)}
+                        className="mt-2 ml-2 bg-red-600 text-white px-4 py-2 rounded-lg"
+                      >
+                        Excluir
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                 <button
+                  onClick={() => baixarPDFDoDia(relatoriosDoDia, data)}
+                  className="mt-3 bg-green-600 text-white px-4 py-2 rounded-lg"
                 >
-                  Excluir
+                  Baixar PDF do dia
                 </button>
               </div>
             ))}
